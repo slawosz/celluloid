@@ -2,6 +2,7 @@ require 'logger'
 require 'thread'
 require 'timeout'
 require 'set'
+require 'time'
 
 module Celluloid
   Error = Class.new StandardError
@@ -573,5 +574,36 @@ require 'celluloid/legacy' unless defined?(CELLULOID_FUTURE)
 # Configure default systemwide settings
 Celluloid.task_class = Celluloid::TaskFiber
 Celluloid.logger     = Logger.new(STDERR)
+Celluloid.logger.formatter = Celluloid::Logger::FORMATTER = proc do |severity, datetime, progname, msg|
+  thread = Thread.current
+  id = " " * 36
+  thread_type = "thread"
+  if thread.celluloid?
+    id = thread.call_chain_id if thread.call_chain_id
+    thread_type = "celluloid-thread"
+    if actor = thread.actor
+      if task = thread.task
+        task_info = "%s[%s](%s)" % [task.class, task.object_id.to_s(16), task.type]
+        msg = "%s %s" % [task_info, msg]
+      end
+      actor_info = "%s[%s]" % [actor.subject.class, actor.object_id.to_s(16)]
+      msg = "%s %s" % [actor_info, msg]
+    end
+  end
+  thread_id = if thread == Thread.main
+                "main"
+              else
+                thread.object_id.to_s(16)
+               end
+
+  "%7s %s %s %s[%s] %s\n" % [
+    severity,
+    $$,
+    datetime.iso8601(6),
+    thread_type,
+    thread_id,
+    msg,
+  ]
+end
 Celluloid.shutdown_timeout = 10
 Celluloid.register_shutdown
