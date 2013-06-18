@@ -9,6 +9,7 @@ logfile = File.open(File.expand_path("../../log/test.log", __FILE__), 'a')
 logfile.sync = true
 
 logger = Celluloid.logger = Logger.new(logfile)
+logger.formatter = Celluloid::Logger::FORMATTER
 
 Celluloid.shutdown_timeout = 1
 
