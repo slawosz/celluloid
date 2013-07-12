@@ -55,6 +55,7 @@ module Celluloid
           waiter << SignalConditionRequest.new(waiter.task, value)
         else
           Logger.debug("Celluloid::Condition signaled spuriously")
+          Logger.debug caller.join("\n")
         end
       end
     end
