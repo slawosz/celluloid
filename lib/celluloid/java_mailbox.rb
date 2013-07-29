@@ -6,7 +6,7 @@ module Celluloid
 
   # Actors communicate with asynchronous messages. Messages are buffered in
   # Mailboxes until Actors can act upon them.
-  class Mailbox
+  class JavaMailbox
     include Enumerable
 
     # A unique address at which this mailbox can be found
