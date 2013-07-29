@@ -31,10 +31,18 @@ shared_context "a Celluloid Mailbox" do
   end
 
   it "waits for a given timeout interval" do
+    # warmup specs, only on jruby
+    java.util.concurrent.TimeUnit::SECONDS
+
     interval = 0.1
+    p "spec #{Time.now.to_f}"
+    subject.receive(interval)# { false }
+    p "spec #{Time.now.to_f}"
     started_at = Time.now
 
-    subject.receive(interval) { false }
+    p "spec #{Time.now.to_f}"
+    subject.receive(100)# { false }
+    p "spec #{Time.now.to_f}"
     (Time.now - started_at).should be_within(Celluloid::TIMER_QUANTUM).of interval
   end
 
